@@ -1,27 +1,36 @@
 const request = require('request');
 
-const searchTerm = process.argv[2];
-console.log(`You searched for: ${searchTerm}`);
-
-request(`https://api.thecatapi.com/v1/breeds/search?q=${searchTerm}`, (error, response, body) => {
-  if (error) {
-    console.error('Error! Breed not found!', error);
-    console.log("Error is ", error);
-    return;
-  }
-
-  if (response.statusCode >= 400) {
-
-    console.log(`Error reached, status code ${response.statusCode}`);
-    return;
-  }
 
 
-  if (!error) {
+const fetchBreedDescription = function(breedName, callback) {
+
+  // callback('siberian', 'siamese');
+
+
+  request(`https://api.thecatapi.com/v1/breeds/search?q=${breedName}`, (error, response, body) => {
+
+    // if (response.statusCode >= 400) {
+    // console.log(`Error reached, status code ${response.statusCode}`);
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
     const data = JSON.parse(body);
-    console.log(data[0].description);
-  }
+    if (data.length < 1) {
+      callback('Error! Breed not found!', null);
 
-});
+      return;
+    }
+
+    if (!error) {
+      callback(null, data[0].description);
+    }
+
+  });
+
+};
+
+module.exports = { fetchBreedDescription };
 
 
